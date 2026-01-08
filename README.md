@@ -1,5 +1,6 @@
 # socu - Structured Optimization using CUDA
 
+[![Preprint](https://img.shields.io/badge/Preprint-arXiv-blue.svg)](https://arxiv.org/abs/2601.03754)
 [![Funding](https://img.shields.io/badge/Grant-NCCR%20Automation%20(51NF40__225155)-90e3dc.svg)](https://nccr-automation.ch/)
 ![License](https://img.shields.io/badge/License-BSD--2--Clause-brightgreen.svg)
 
@@ -202,6 +203,18 @@ For optimal performance:
    )
    ```
 3. **Precision selection**: Use `wp.float32` / `jnp.float32` for up to 4x speedup when precision allows
+
+## Citing our Work
+
+If you found socu useful in your scientific work, we encourage you to cite our preprint:
+```
+@misc{schwan2026socu,
+  author = {Roland Schwan and Daniel Kuhn and Colin N. Jones},
+  title = {{GPU}-Accelerated {Cholesky} Factorization of Block Tridiagonal Matrices},
+  year = {2026},
+  eprint = {arXiv:2601.03754},
+}
+```
 
 ## License
 
