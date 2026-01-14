@@ -28,3 +28,36 @@ addopts = ["-ra", "-s"]
 testpaths = [
   "tests",
 ]
+
+
+[project.optional-dependencies]
+cuda = [
+    "torch",
+]
+cpu = [
+    "torch",
+]
+
+[tool.uv]
+conflicts = [
+    [
+        {extra = "cuda"},
+        {extra = "cpu"},
+    ],
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cuda", extra = "cuda" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cuda"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
