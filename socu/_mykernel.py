@@ -128,6 +128,30 @@ class MyKernel:
         ]
         self._lib.syrk_update.restype = None
 
+        # Optional timing helpers (newer builds):
+        # - create_event/destroy_event
+        # - event_record/event_synchronize
+        # - event_elapsed_ms
+        if hasattr(self._lib, "create_event"):
+            self._lib.create_event.restype = ctypes.c_int64
+            self._lib.destroy_event.argtypes = [ctypes.c_int64]
+            self._lib.destroy_event.restype = None
+
+            self._lib.event_record.argtypes = [ctypes.c_int64, ctypes.c_int64]
+            self._lib.event_record.restype = ctypes.c_int
+
+            self._lib.event_synchronize.argtypes = [ctypes.c_int64]
+            self._lib.event_synchronize.restype = ctypes.c_int
+
+            self._lib.event_elapsed_ms.argtypes = [ctypes.c_int64, ctypes.c_int64]
+            self._lib.event_elapsed_ms.restype = ctypes.c_float
+        else:
+            self._lib.create_event = None
+            self._lib.destroy_event = None
+            self._lib.event_record = None
+            self._lib.event_synchronize = None
+            self._lib.event_elapsed_ms = None
+
     @property
     def dll_path(self) -> Path:
         return self._dll_path
@@ -154,6 +178,33 @@ class MyKernel:
             ctypes.c_int(n),
             ctypes.c_int64(stream),
         )
+
+    def create_event(self) -> int:
+        if self._lib.create_event is None:
+            raise AttributeError("create_event not found in DLL. Rebuild/install a newer mykernel.dll.")
+        return int(self._lib.create_event())
+
+    def destroy_event(self, event: int) -> None:
+        if self._lib.destroy_event is None:
+            raise AttributeError("destroy_event not found in DLL. Rebuild/install a newer mykernel.dll.")
+        self._lib.destroy_event(ctypes.c_int64(event))
+
+    def event_record(self, event: int, stream: int) -> int:
+        if self._lib.event_record is None:
+            raise AttributeError("event_record not found in DLL. Rebuild/install a newer mykernel.dll.")
+        return int(self._lib.event_record(ctypes.c_int64(event), ctypes.c_int64(stream)))
+
+    def event_synchronize(self, event: int) -> int:
+        if self._lib.event_synchronize is None:
+            raise AttributeError(
+                "event_synchronize not found in DLL. Rebuild/install a newer mykernel.dll."
+            )
+        return int(self._lib.event_synchronize(ctypes.c_int64(event)))
+
+    def event_elapsed_ms(self, start_event: int, end_event: int) -> float:
+        if self._lib.event_elapsed_ms is None:
+            raise AttributeError("event_elapsed_ms not found in DLL. Rebuild/install a newer mykernel.dll.")
+        return float(self._lib.event_elapsed_ms(ctypes.c_int64(start_event), ctypes.c_int64(end_event)))
 
 
 def device_ptr(x: Any) -> int:

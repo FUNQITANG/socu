@@ -50,6 +50,7 @@ __global__ void syrk_update_kernel(const float* __restrict__ E,
     const size_t col_offset = (size_t)col * (size_t)n;
 
     double acc = 0.0;
+    // float acc = 0.0f;
     for (int k = 0; k < n; ++k) {
         const double a = (double)E_mat[row_offset + (size_t)k];
         const double b2 = (double)E_mat[col_offset + (size_t)k];
@@ -69,18 +70,64 @@ DLL_EXPORT void __cdecl destroy_stream(int64_t stream_handle) {
     cudaStream_t s = (cudaStream_t)stream_handle;
     cudaStreamDestroy(s);
 }
-
+// ------------------------------
 // Synchronize a CUDA stream created by create_stream().
+// ------------------------------
+
 // Returns cudaError_t as int (0 == cudaSuccess).
 DLL_EXPORT int __cdecl stream_synchronize(int64_t stream_handle) {
     cudaStream_t s = (cudaStream_t)stream_handle;
     return (int)cudaStreamSynchronize(s);
 }
 
-DLL_EXPORT void __cdecl syrk_update(const float* E, float* D, int B, int M, int n, int64_t stream_handle) {
-    /*
-    * B * M 个 n x n 矩阵
-    */
+
+// ------------------------------
+// CUDA event timing helpers
+// ------------------------------
+
+// Create a CUDA event (timing-enabled). Returns an opaque handle.
+DLL_EXPORT int64_t __cdecl create_event() {
+    cudaEvent_t e;
+    // Default events support timing.
+    cudaEventCreateWithFlags(&e, cudaEventDefault);
+    return (int64_t)(uintptr_t)e;
+}
+
+DLL_EXPORT void __cdecl destroy_event(int64_t event_handle) {
+    cudaEvent_t e = (cudaEvent_t)(uintptr_t)event_handle;
+    cudaEventDestroy(e);
+}
+
+// Record an event on a stream. Returns cudaError_t (0 == cudaSuccess).
+DLL_EXPORT int __cdecl event_record(int64_t event_handle, int64_t stream_handle) {
+    cudaEvent_t e = (cudaEvent_t)(uintptr_t)event_handle;
+    cudaStream_t s = (cudaStream_t)stream_handle;
+    return (int)cudaEventRecord(e, s);
+}
+
+// Synchronize a CUDA event. Returns cudaError_t (0 == cudaSuccess).
+DLL_EXPORT int __cdecl event_synchronize(int64_t event_handle) {
+    cudaEvent_t e = (cudaEvent_t)(uintptr_t)event_handle;
+    return (int)cudaEventSynchronize(e);
+}
+
+// Returns elapsed time in milliseconds between two recorded events.
+// If either event was not recorded, returns -1.
+DLL_EXPORT float __cdecl event_elapsed_ms(int64_t start_event_handle, int64_t end_event_handle) {
+    cudaEvent_t start = (cudaEvent_t)(uintptr_t)start_event_handle;
+    cudaEvent_t end = (cudaEvent_t)(uintptr_t)end_event_handle;
+    float ms = -1.0f;
+    cudaError_t err = cudaEventElapsedTime(&ms, start, end);
+    if (err != cudaSuccess) {
+        return -1.0f;
+    }
+    return ms;
+}
+
+
+// ------------------------------
+// syrk update wrapper
+// ------------------------------
 /*
 DLL_EXPORT void __cdecl launch_my_kernel(const float* in, float* out, int n, int64_t stream_handle) {
     cudaStream_t stream = (cudaStream_t)stream_handle;
@@ -89,6 +136,10 @@ DLL_EXPORT void __cdecl launch_my_kernel(const float* in, float* out, int n, int
     my_kernel<<<blocks, threads, 0, stream>>>(in, out, n);
 }
 */
+DLL_EXPORT void __cdecl syrk_update(const float* E, float* D, int B, int M, int n, int64_t stream_handle) {
+    /*
+    * B * M 个 n x n 矩阵
+    */
     cudaStream_t stream = (cudaStream_t)stream_handle;
     constexpr int TILE = 16;
     dim3 threads(TILE, TILE, 1);
