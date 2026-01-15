@@ -26,6 +26,7 @@ __global__ void syrk_update_kernel(const float* __restrict__ E,
     int m = bm - b * M;
     int j = (int)threadIdx.x;
     int i = (int)threadIdx.y;
+    // 这是 CUDA kernel 常见的“线程可能多于数据”的安全写法
     if (i >= n || j >= n) return;
 
     const float* E_mat = E + ((b * M + m) * n * n);
@@ -47,6 +48,13 @@ DLL_EXPORT int64_t __cdecl create_stream() {
 DLL_EXPORT void __cdecl destroy_stream(int64_t stream_handle) {
     cudaStream_t s = (cudaStream_t)stream_handle;
     cudaStreamDestroy(s);
+}
+
+// Synchronize a CUDA stream created by create_stream().
+// Returns cudaError_t as int (0 == cudaSuccess).
+DLL_EXPORT int __cdecl stream_synchronize(int64_t stream_handle) {
+    cudaStream_t s = (cudaStream_t)stream_handle;
+    return (int)cudaStreamSynchronize(s);
 }
 
 DLL_EXPORT void __cdecl syrk_update(const float* E, float* D, int B, int M, int n, int64_t stream_handle) {

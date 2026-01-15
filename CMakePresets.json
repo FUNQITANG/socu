@@ -12,7 +12,7 @@
       "hidden": true,
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "installDir": "${sourceDir}/out/build/${presetName}/install",
+      "installDir": "${sourceDir}/tests/_native",
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
 
@@ -22,7 +22,9 @@
         "CUDAToolkit_ROOT": "$env{SOCU_CUDA_ROOT}",
         "CMAKE_CUDA_COMPILER": "$env{SOCU_CUDA_ROOT}/bin/nvcc.exe",
 
-        "SOCU_NVCC_ALLOW_UNSUPPORTED_COMPILER": "ON"
+        "SOCU_NVCC_ALLOW_UNSUPPORTED_COMPILER": "ON",
+
+        "SOCU_PYTHON_NATIVE_DIR": "${sourceDir}/tests/_native"
       },
       "environment": {
         "SOCU_CUDA_ROOT": "C:/CUDA"
