@@ -1,0 +1,89 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base-win",
+      "description":  "项目基础配置 Windows 下使用 Ninja 生成器和 CUDA 支持",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/build/${presetName}/install",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+
+        "SOCU_BUILD_DEMO": "ON",
+
+        "CMAKE_CUDA_ARCHITECTURES": "86",
+        "CUDAToolkit_ROOT": "$env{SOCU_CUDA_ROOT}",
+        "CMAKE_CUDA_COMPILER": "$env{SOCU_CUDA_ROOT}/bin/nvcc.exe",
+
+        "SOCU_NVCC_ALLOW_UNSUPPORTED_COMPILER": "ON"
+      },
+      "environment": {
+        "SOCU_CUDA_ROOT": "C:/CUDA"
+      }
+    },
+
+    {
+      "name": "win-ninja-release",
+      "displayName": "Windows (Ninja) - Release",
+      "description": "Windows + Ninja + MSVC host compiler + CUDA. Assumes you are running inside a Visual Studio Developer Shell (so cl.exe/link.exe are available).",
+      "inherits": "base-win",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "win-ninja-debug",
+      "displayName": "Windows (Ninja) - Debug",
+      "description": "Windows + Ninja + MSVC host compiler + CUDA (Debug). Assumes VS Developer Shell.",
+      "inherits": "base-win",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+
+    {
+      "name": "win-ninja-release-oneapi",
+      "displayName": "Windows (Ninja) - Release + oneAPI",
+      "description": "Same as win-ninja-release but enables oneAPI-related env variables. Still assumes VS Developer Shell for Windows SDK + linker.",
+      "inherits": "win-ninja-release",
+      "environment": {
+        "SOCU_ONEAPI_ROOT": ""
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "win-ninja-release",
+      "configurePreset": "win-ninja-release",
+      "jobs": 8
+    },
+    {
+      "name": "win-ninja-debug",
+      "configurePreset": "win-ninja-debug",
+      "jobs": 8
+    },
+    {
+      "name": "win-ninja-release-mykernel",
+      "displayName": "Windows (Ninja) - Release (mykernel only)",
+      "configurePreset": "win-ninja-release",
+      "targets": ["mykernel"],
+      "jobs": 8
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "ctest",
+      "configurePreset": "win-ninja-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

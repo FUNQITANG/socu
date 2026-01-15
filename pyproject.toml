@@ -38,10 +38,16 @@ cpu = [
     "torch",
 ]
 
+[dependency-groups]
+ext = [
+    "ninja",
+]
+
 [tool.uv]
 conflicts = [
     [
         {extra = "cuda"},
+        {extra = "cuda130"},
         {extra = "cpu"},
     ],
 ]
@@ -50,11 +56,17 @@ conflicts = [
 torch = [
     { index = "pytorch-cpu", extra = "cpu" },
     { index = "pytorch-cuda", extra = "cuda" },
+    { index = "pytorch-cuda130", extra = "cuda130" },
 ]
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cuda130"
+url = "https://download.pytorch.org/whl/cu130"
 explicit = true
 
 [[tool.uv.index]]

@@ -6,3 +6,7 @@ __pycache__
 *.prof
 .[v]env
 .vscode
+
+# CMake user-local presets (paths, SDK locations, etc.)
+CMakeUserPresets.json
+out
