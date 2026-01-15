@@ -1,0 +1,17 @@
+{
+  "terminal.integrated.profiles.windows": {
+    "工作区 DevShell (MSVC)": {
+        "source": "PowerShell",
+        "icon": "terminal-powershell",
+        "args": [
+            "-NoExit",
+            "-ExecutionPolicy", "Bypass",
+            "-Command",
+              "$vs='${env:VS_DIR}';\n" +
+              "if (-not $vs) { $vs='A:\\Visual Studio\\18\\Enterprise' }\n" +
+              "& \"$vs\\Common7\\Tools\\Launch-VsDevShell.ps1\" -Arch amd64 -HostArch amd64 -SkipAutomaticLocation"
+      ]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "工作区 DevShell (MSVC)"
+}

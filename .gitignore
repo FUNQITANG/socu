@@ -5,7 +5,8 @@ __pycache__
 *.net
 *.prof
 .[v]env
-.vscode
+.vscode/*
+!.vscode/*.example
 
 # CMake user-local presets (paths, SDK locations, etc.)
 CMakeUserPresets.json
